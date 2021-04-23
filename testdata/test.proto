@@ -1,0 +1,18 @@
+syntax = "proto3";
+package testproto;
+option go_package = "github.com/sryoya/protorand/testproto";
+
+message TestMessage {
+  string some_str = 1;
+  int32 some_int = 2;
+  float some_float = 3;
+  bool some_bool = 4;
+  repeated string some_slice = 5;
+  ChildMessage some_msg = 6;
+  repeated ChildMessage some_msgs = 7;
+  map<int32, ChildMessage> some_map = 8;
+}
+
+message ChildMessage{
+  int32 some_int = 1;
+}
