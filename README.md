@@ -49,4 +49,4 @@ You are more than welcome to contribute to this project. Fork and make a Pull Re
 
 ## Licence
 
-[Apache License 2.0](./LICENSE)
+[MIT License](./LICENSE)
