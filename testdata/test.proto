@@ -11,8 +11,20 @@ message TestMessage {
   ChildMessage some_msg = 6;
   repeated ChildMessage some_msgs = 7;
   map<int32, ChildMessage> some_map = 8;
+  SomeEnum some_enum = 9;
+  SomeEnum2 some_enum2 = 10;
 }
 
 message ChildMessage{
   int32 some_int = 1;
+}
+
+enum SomeEnum {
+  SOME_ENUM_UNKNOWN = 0;
+  SOME_ENUM_VALUE_1 = 1;
+  SOME_ENUM_VALUE_2 = 2;
+}
+
+enum SomeEnum2 {
+  SOME_ENUM_2_UNKNOWN = 0;
 }

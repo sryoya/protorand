@@ -15,6 +15,7 @@ func init() {
 	randomFloat = func() float32 { return 10.1 }
 	randomString = func(int) string { return "Gopher" }
 	randomBool = func() bool { return true }
+	randIntForEnum = func(n int) int { return n }
 }
 
 func TestEmbedValues(t *testing.T) {
@@ -37,6 +38,8 @@ func TestEmbedValues(t *testing.T) {
 				SomeInt: 10,
 			},
 		},
+		SomeEnum:  testpb.SomeEnum_SOME_ENUM_VALUE_2,
+		SomeEnum2: 0,
 	}
 
 	EmbedValues(target)

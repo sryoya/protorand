@@ -13,10 +13,12 @@ import (
 var (
 	chars = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 
-	randomInt32  = genRandInt32
-	randomFloat  = genRandFloat
-	randomString = genRandString
-	randomBool   = genRandBool
+	// These aim to enable to inject the random value to be fixed in testing
+	randomInt32    = genRandInt32
+	randomFloat    = genRandFloat
+	randomString   = genRandString
+	randomBool     = genRandBool
+	randIntForEnum = rand.Intn
 )
 
 func init() {
@@ -47,6 +49,9 @@ func NewDynamicProtoRand(mds protoreflect.MessageDescriptor) (*dynamicpb.Message
 			return protoreflect.ValueOfString(randomString(10)), nil
 		case protoreflect.BoolKind:
 			return protoreflect.ValueOfBool(randomBool()), nil
+		case protoreflect.EnumKind:
+			fmt.Printf("%#v", fd.Enum().Values())
+			return protoreflect.ValueOfEnum(getRandomEnum(fd.Enum().Values())), nil
 		case protoreflect.MessageKind:
 			// process recursively
 			rm, err := NewDynamicProtoRand(fd.Message())
@@ -119,4 +124,32 @@ func genRandString(n int) string {
 
 func genRandBool() bool {
 	return rand.Int31()%2 == 0
+}
+
+func getRandomEnum(values protoreflect.EnumValueDescriptors) protoreflect.EnumNumber {
+	ln := values.Len()
+	if ln <= 1 {
+		return 0
+	}
+
+	value := values.Get(randIntForEnum(ln - 1))
+
+	return value.Number()
+}
+
+func getEnumRandomly(ranges protoreflect.EnumRanges) protoreflect.EnumNumber {
+	// select one of the number ranges
+	selectedRange := ranges.Get(1)
+	if ranges.Len() > 2 {
+		selectedRange = ranges.Get(rand.Intn(ranges.Len() - 1))
+	}
+
+	// select one of the numbers in the selected range
+	startNum := int(selectedRange[0])
+	endNum := int(selectedRange[1])
+	if startNum == endNum {
+		return protoreflect.EnumNumber(startNum)
+	}
+	selectedNum := rand.Intn(endNum-startNum) + startNum
+	return protoreflect.EnumNumber(selectedNum)
 }
