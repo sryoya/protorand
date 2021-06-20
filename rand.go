@@ -51,7 +51,7 @@ func NewDynamicProtoRand(mds protoreflect.MessageDescriptor) (*dynamicpb.Message
 		case protoreflect.BoolKind:
 			return protoreflect.ValueOfBool(randomBool()), nil
 		case protoreflect.EnumKind:
-			return protoreflect.ValueOfEnum(getRandomEnum(fd.Enum().Values())), nil
+			return protoreflect.ValueOfEnum(chooseEnumValueRandomly(fd.Enum().Values())), nil
 		case protoreflect.MessageKind:
 			// process recursively
 			rm, err := NewDynamicProtoRand(fd.Message())
@@ -69,7 +69,7 @@ func NewDynamicProtoRand(mds protoreflect.MessageDescriptor) (*dynamicpb.Message
 	oneOfs := mds.Oneofs()
 	for i := 0; i < oneOfs.Len(); i++ {
 		oneOf := oneOfs.Get(i)
-		populatedOneOfField[oneOf.Name()] = chooseRandomOneOfField(oneOf).Number()
+		populatedOneOfField[oneOf.Name()] = chooseOneOfFieldRandomly(oneOf).Number()
 	}
 
 	dm := dynamicpb.NewMessage(mds)
@@ -142,7 +142,7 @@ func genRandBool() bool {
 	return rand.Int31()%2 == 0
 }
 
-func getRandomEnum(values protoreflect.EnumValueDescriptors) protoreflect.EnumNumber {
+func chooseEnumValueRandomly(values protoreflect.EnumValueDescriptors) protoreflect.EnumNumber {
 	ln := values.Len()
 	if ln <= 1 {
 		return 0
@@ -153,24 +153,7 @@ func getRandomEnum(values protoreflect.EnumValueDescriptors) protoreflect.EnumNu
 	return value.Number()
 }
 
-func getEnumRandomly(ranges protoreflect.EnumRanges) protoreflect.EnumNumber {
-	// select one of the number ranges
-	selectedRange := ranges.Get(1)
-	if ranges.Len() > 2 {
-		selectedRange = ranges.Get(rand.Intn(ranges.Len() - 1))
-	}
-
-	// select one of the numbers in the selected range
-	startNum := int(selectedRange[0])
-	endNum := int(selectedRange[1])
-	if startNum == endNum {
-		return protoreflect.EnumNumber(startNum)
-	}
-	selectedNum := rand.Intn(endNum-startNum) + startNum
-	return protoreflect.EnumNumber(selectedNum)
-}
-
-func chooseRandomOneOfField(oneOf protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func chooseOneOfFieldRandomly(oneOf protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	index := randIndexForEnum(oneOf.Fields().Len() - 1)
 	return oneOf.Fields().Get(index)
 }
