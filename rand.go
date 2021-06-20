@@ -14,11 +14,12 @@ var (
 	chars = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 
 	// These aim to enable to inject the random value to be fixed in testing
-	randomInt32    = genRandInt32
-	randomFloat    = genRandFloat
-	randomString   = genRandString
-	randomBool     = genRandBool
-	randIntForEnum = rand.Intn
+	randomInt32      = genRandInt32
+	randomFloat      = genRandFloat
+	randomString     = genRandString
+	randomBool       = genRandBool
+	randIntForEnum   = rand.Intn
+	randIndexForEnum = rand.Intn
 )
 
 func init() {
@@ -30,7 +31,7 @@ func EmbedValues(msg proto.Message) error {
 	mds := msg.ProtoReflect().Descriptor()
 	dm, err := NewDynamicProtoRand(mds)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	proto.Merge(msg, dm)
@@ -50,7 +51,6 @@ func NewDynamicProtoRand(mds protoreflect.MessageDescriptor) (*dynamicpb.Message
 		case protoreflect.BoolKind:
 			return protoreflect.ValueOfBool(randomBool()), nil
 		case protoreflect.EnumKind:
-			fmt.Printf("%#v", fd.Enum().Values())
 			return protoreflect.ValueOfEnum(getRandomEnum(fd.Enum().Values())), nil
 		case protoreflect.MessageKind:
 			// process recursively
@@ -64,10 +64,26 @@ func NewDynamicProtoRand(mds protoreflect.MessageDescriptor) (*dynamicpb.Message
 		}
 	}
 
+	// decide which fields in each OneOf will be populated in advance
+	populatedOneOfField := map[protoreflect.Name]protoreflect.FieldNumber{}
+	oneOfs := mds.Oneofs()
+	for i := 0; i < oneOfs.Len(); i++ {
+		oneOf := oneOfs.Get(i)
+		populatedOneOfField[oneOf.Name()] = chooseRandomOneOfField(oneOf).Number()
+	}
+
 	dm := dynamicpb.NewMessage(mds)
 	fds := mds.Fields()
 	for k := 0; k < fds.Len(); k++ {
 		fd := fds.Get(k)
+
+		// If a field is in OneOf, check if the field should be populated
+		if oneOf := fd.ContainingOneof(); oneOf != nil {
+			populatedFieldNum := populatedOneOfField[oneOf.Name()]
+			if populatedFieldNum != fd.Number() {
+				continue
+			}
+		}
 
 		if fd.IsList() {
 			list := dm.Mutable(fd).List()
@@ -152,4 +168,9 @@ func getEnumRandomly(ranges protoreflect.EnumRanges) protoreflect.EnumNumber {
 	}
 	selectedNum := rand.Intn(endNum-startNum) + startNum
 	return protoreflect.EnumNumber(selectedNum)
+}
+
+func chooseRandomOneOfField(oneOf protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+	index := randIndexForEnum(oneOf.Fields().Len() - 1)
+	return oneOf.Fields().Get(index)
 }

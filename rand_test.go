@@ -16,6 +16,7 @@ func init() {
 	randomString = func(int) string { return "Gopher" }
 	randomBool = func() bool { return true }
 	randIntForEnum = func(n int) int { return n }
+	randIndexForEnum = func(n int) int { return n }
 }
 
 func TestEmbedValues(t *testing.T) {
@@ -40,9 +41,15 @@ func TestEmbedValues(t *testing.T) {
 		},
 		SomeEnum:  testpb.SomeEnum_SOME_ENUM_VALUE_2,
 		SomeEnum2: 0,
+		SomeOneOf: &testpb.TestMessage_OneOfStr{
+			OneOfStr: "Gopher",
+		},
 	}
 
-	EmbedValues(target)
+	err := EmbedValues(target)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
 	if diff := cmp.Diff(expected, target, protocmp.Transform()); diff != "" {
 		t.Errorf("response didn't match (-want / +got)\n%s", diff)
