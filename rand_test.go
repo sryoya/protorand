@@ -12,7 +12,9 @@ import (
 func init() {
 	// inject random generated values to be fixed
 	randomInt32 = func() int32 { return 10 }
-	randomFloat = func() float32 { return 10.1 }
+	randomFloat32 = func() float32 { return 10.1 }
+	randomInt64 = func() int64 { return 20 }
+	randomFloat64 = func() float64 { return 20.22 }
 	randomString = func(int) string { return "Gopher" }
 	randomBool = func() bool { return true }
 	randIntForEnum = func(n int) int { return n }
@@ -23,10 +25,12 @@ func TestEmbedValues(t *testing.T) {
 	target := &testpb.TestMessage{}
 
 	expected := &testpb.TestMessage{
-		SomeInt:   10,
-		SomeFloat: 10.1,
-		SomeStr:   "Gopher",
-		SomeBool:  true,
+		SomeInt32:   10,
+		SomeFloat32: 10.1,
+		SomeInt64:   10,
+		SomeFloat64: 10.1,
+		SomeStr:     "Gopher",
+		SomeBool:    true,
 		SomeMsg: &testpb.ChildMessage{
 			SomeInt: 10,
 		},

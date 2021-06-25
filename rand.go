@@ -15,7 +15,9 @@ var (
 
 	// These aim to enable to inject the random value to be fixed in testing
 	randomInt32      = genRandInt32
-	randomFloat      = genRandFloat
+	randomInt64      = genRandInt64
+	randomFloat32    = genRandFloat32
+	randomFloat64    = genRandFloat64
 	randomString     = genRandString
 	randomBool       = genRandBool
 	randIntForEnum   = rand.Intn
@@ -44,8 +46,12 @@ func NewDynamicProtoRand(mds protoreflect.MessageDescriptor) (*dynamicpb.Message
 		switch fd.Kind() {
 		case protoreflect.Int32Kind:
 			return protoreflect.ValueOfInt32(randomInt32()), nil
+		case protoreflect.Int64Kind:
+			return protoreflect.ValueOfInt64(randomInt64()), nil
 		case protoreflect.FloatKind:
-			return protoreflect.ValueOfFloat32(randomFloat()), nil
+			return protoreflect.ValueOfFloat32(randomFloat32()), nil
+		case protoreflect.DoubleKind:
+			return protoreflect.ValueOfFloat64(randomFloat64()), nil
 		case protoreflect.StringKind:
 			return protoreflect.ValueOfString(randomString(10)), nil
 		case protoreflect.BoolKind:
@@ -59,6 +65,7 @@ func NewDynamicProtoRand(mds protoreflect.MessageDescriptor) (*dynamicpb.Message
 				return protoreflect.Value{}, err
 			}
 			return protoreflect.ValueOfMessage(rm), nil
+		// TODO: Sint32Kind, Sfixed32Kind, Sint64Kind, Sfixed64Kind, BytesKind, GroupKind
 		default:
 			return protoreflect.Value{}, fmt.Errorf("unexpected type: %v", fd.Kind())
 		}
@@ -126,8 +133,16 @@ func genRandInt32() int32 {
 	return rand.Int31()
 }
 
-func genRandFloat() float32 {
+func genRandInt64() int64 {
+	return rand.Int63()
+}
+
+func genRandFloat32() float32 {
 	return rand.Float32()
+}
+
+func genRandFloat64() float64 {
+	return rand.Float64()
 }
 
 func genRandString(n int) string {
@@ -149,7 +164,6 @@ func chooseEnumValueRandomly(values protoreflect.EnumValueDescriptors) protorefl
 	}
 
 	value := values.Get(randIntForEnum(ln - 1))
-
 	return value.Number()
 }
 
