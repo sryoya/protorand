@@ -5,19 +5,21 @@ option go_package = "github.com/sryoya/protorand/testproto";
 message TestMessage {
   string some_str = 1;
   int32 some_int32 = 2;
-  int32 some_int64 = 3;
-  float some_float32 = 4;
-  float some_float64 = 5;
-  bool some_bool = 6;
-  repeated string some_slice = 7;
-  ChildMessage some_msg = 8;
-  repeated ChildMessage some_msgs = 9;
-  map<int32, ChildMessage> some_map = 10;
-  SomeEnum some_enum = 11;
-  SomeEnum2 some_enum2 = 12;
+  sint32 some_sint32 = 3;
+  int64 some_int64 = 4;
+  sint64 some_sint64 = 5;
+  float some_float32 = 6;
+  float some_float64 = 7;
+  bool some_bool = 8;
+  repeated string some_slice = 9;
+  ChildMessage some_msg = 10;
+  repeated ChildMessage some_msgs = 11;
+  map<int32, ChildMessage> some_map = 12;
+  SomeEnum some_enum = 13;
+  SomeEnum2 some_enum2 = 14;
   oneof some_one_of {
-    int32 one_of_int32 = 13;
-    string one_of_str = 14;
+    int32 one_of_int32 = 15;
+    string one_of_str = 16;
   }
 }
 
@@ -28,7 +30,7 @@ message ChildMessage{
 enum SomeEnum {
   SOME_ENUM_UNKNOWN = 0;
   SOME_ENUM_VALUE_1 = 1;
-  SOME_ENUM_VALUE_2 = 2;
+  SOME_ENUM_VALUE_2 = 3;
 }
 
 enum SomeEnum2 {

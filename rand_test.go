@@ -26,8 +26,10 @@ func TestEmbedValues(t *testing.T) {
 
 	expected := &testpb.TestMessage{
 		SomeInt32:   10,
+		SomeSint32:  10,
 		SomeFloat32: 10.1,
-		SomeInt64:   10,
+		SomeInt64:   20,
+		SomeSint64:  20,
 		SomeFloat64: 10.1,
 		SomeStr:     "Gopher",
 		SomeBool:    true,
