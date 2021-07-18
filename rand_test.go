@@ -12,8 +12,10 @@ import (
 func init() {
 	// inject random generated values to be fixed
 	randomInt32 = func() int32 { return 10 }
+	randomUint32 = func() uint32 { return 11 }
 	randomFloat32 = func() float32 { return 10.1 }
 	randomInt64 = func() int64 { return 20 }
+	randomUint64 = func() uint64 { return 21 }
 	randomFloat64 = func() float64 { return 20.22 }
 	randomString = func(int) string { return "Gopher" }
 	randomBool = func() bool { return true }
@@ -27,9 +29,11 @@ func TestEmbedValues(t *testing.T) {
 	expected := &testpb.TestMessage{
 		SomeInt32:   10,
 		SomeSint32:  10,
+		SomeUint32:  11,
 		SomeFloat32: 10.1,
 		SomeInt64:   20,
 		SomeSint64:  20,
+		SomeUint64:  21,
 		SomeFloat64: 10.1,
 		SomeStr:     "Gopher",
 		SomeBool:    true,

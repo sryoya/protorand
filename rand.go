@@ -16,6 +16,8 @@ var (
 	// These aim to enable to inject the random value to be fixed in testing
 	randomInt32      = genRandInt32
 	randomInt64      = genRandInt64
+	randomUint32     = genRandUint32
+	randomUint64     = genRandUint64
 	randomFloat32    = genRandFloat32
 	randomFloat64    = genRandFloat64
 	randomString     = genRandString
@@ -48,6 +50,10 @@ func NewDynamicProtoRand(mds protoreflect.MessageDescriptor) (*dynamicpb.Message
 			return protoreflect.ValueOfInt32(randomInt32()), nil
 		case protoreflect.Int64Kind, protoreflect.Sint64Kind:
 			return protoreflect.ValueOfInt64(randomInt64()), nil
+		case protoreflect.Uint32Kind:
+			return protoreflect.ValueOfUint32(randomUint32()), nil
+		case protoreflect.Uint64Kind:
+			return protoreflect.ValueOfUint64(randomUint64()), nil
 		case protoreflect.FloatKind:
 			return protoreflect.ValueOfFloat32(randomFloat32()), nil
 		case protoreflect.DoubleKind:
@@ -135,6 +141,14 @@ func genRandInt32() int32 {
 
 func genRandInt64() int64 {
 	return rand.Int63()
+}
+
+func genRandUint32() uint32 {
+	return rand.Uint32()
+}
+
+func genRandUint64() uint64 {
+	return rand.Uint64()
 }
 
 func genRandFloat32() float32 {

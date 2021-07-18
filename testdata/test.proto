@@ -6,20 +6,22 @@ message TestMessage {
   string some_str = 1;
   int32 some_int32 = 2;
   sint32 some_sint32 = 3;
-  int64 some_int64 = 4;
-  sint64 some_sint64 = 5;
-  float some_float32 = 6;
-  float some_float64 = 7;
-  bool some_bool = 8;
-  repeated string some_slice = 9;
-  ChildMessage some_msg = 10;
-  repeated ChildMessage some_msgs = 11;
-  map<int32, ChildMessage> some_map = 12;
-  SomeEnum some_enum = 13;
-  SomeEnum2 some_enum2 = 14;
+  uint32 some_uint32 = 4;
+  int64 some_int64 = 5;
+  sint64 some_sint64 = 6;
+  uint64 some_uint64 = 7;
+  float some_float32 = 8;
+  float some_float64 = 9;
+  bool some_bool = 10;
+  repeated string some_slice = 11;
+  ChildMessage some_msg = 12;
+  repeated ChildMessage some_msgs = 13;
+  map<int32, ChildMessage> some_map = 14;
+  SomeEnum some_enum = 15;
+  SomeEnum2 some_enum2 = 16;
   oneof some_one_of {
-    int32 one_of_int32 = 15;
-    string one_of_str = 16;
+    int32 one_of_int32 = 17;
+    string one_of_str = 18;
   }
 }
 
@@ -30,7 +32,7 @@ message ChildMessage{
 enum SomeEnum {
   SOME_ENUM_UNKNOWN = 0;
   SOME_ENUM_VALUE_1 = 1;
-  SOME_ENUM_VALUE_2 = 3;
+  SOME_ENUM_VALUE_2 = 2;
 }
 
 enum SomeEnum2 {
