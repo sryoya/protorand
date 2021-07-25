@@ -46,9 +46,13 @@ func EmbedValues(msg proto.Message) error {
 func NewDynamicProtoRand(mds protoreflect.MessageDescriptor) (*dynamicpb.Message, error) {
 	getRandValue := func(fd protoreflect.FieldDescriptor) (protoreflect.Value, error) {
 		switch fd.Kind() {
-		case protoreflect.Int32Kind, protoreflect.Sint32Kind:
+		case protoreflect.Int32Kind:
 			return protoreflect.ValueOfInt32(randomInt32()), nil
-		case protoreflect.Int64Kind, protoreflect.Sint64Kind:
+		case protoreflect.Int64Kind:
+			return protoreflect.ValueOfInt64(randomInt64()), nil
+		case protoreflect.Sint32Kind:
+			return protoreflect.ValueOfInt32(randomInt32()), nil
+		case protoreflect.Sint64Kind:
 			return protoreflect.ValueOfInt64(randomInt64()), nil
 		case protoreflect.Uint32Kind:
 			return protoreflect.ValueOfUint32(randomUint32()), nil
