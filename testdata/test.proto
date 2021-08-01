@@ -7,21 +7,25 @@ message TestMessage {
   int32 some_int32 = 2;
   sint32 some_sint32 = 3;
   uint32 some_uint32 = 4;
-  int64 some_int64 = 5;
-  sint64 some_sint64 = 6;
-  uint64 some_uint64 = 7;
-  float some_float32 = 8;
-  float some_float64 = 9;
-  bool some_bool = 10;
-  repeated string some_slice = 11;
-  ChildMessage some_msg = 12;
-  repeated ChildMessage some_msgs = 13;
-  map<int32, ChildMessage> some_map = 14;
-  SomeEnum some_enum = 15;
-  SomeEnum2 some_enum2 = 16;
+  fixed32 some_fixed32 = 5;
+  sfixed32 some_sfixed32 = 6;
+  int64 some_int64 = 7;
+  sint64 some_sint64 = 8;
+  uint64 some_uint64 = 9;
+  fixed64 some_fixed64 = 10;
+  sfixed64 some_sfixed64 = 11;
+  float some_float32 = 12;
+  float some_float64 = 13;
+  bool some_bool = 14;
+  repeated string some_slice = 15;
+  ChildMessage some_msg = 16;
+  repeated ChildMessage some_msgs = 17;
+  map<int32, ChildMessage> some_map = 18;
+  SomeEnum some_enum = 19;
+  SomeEnum2 some_enum2 = 20;
   oneof some_one_of {
-    int32 one_of_int32 = 17;
-    string one_of_str = 18;
+    int32 one_of_int32 = 21;
+    string one_of_str = 22;
   }
 }
 

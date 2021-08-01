@@ -58,6 +58,14 @@ func NewDynamicProtoRand(mds protoreflect.MessageDescriptor) (*dynamicpb.Message
 			return protoreflect.ValueOfUint32(randomUint32()), nil
 		case protoreflect.Uint64Kind:
 			return protoreflect.ValueOfUint64(randomUint64()), nil
+		case protoreflect.Fixed32Kind:
+			return protoreflect.ValueOfUint32(randomUint32()), nil
+		case protoreflect.Fixed64Kind:
+			return protoreflect.ValueOfUint64(randomUint64()), nil
+		case protoreflect.Sfixed32Kind:
+			return protoreflect.ValueOfInt32(randomInt32()), nil
+		case protoreflect.Sfixed64Kind:
+			return protoreflect.ValueOfInt64(randomInt64()), nil
 		case protoreflect.FloatKind:
 			return protoreflect.ValueOfFloat32(randomFloat32()), nil
 		case protoreflect.DoubleKind:
