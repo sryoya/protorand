@@ -44,7 +44,7 @@ fmt.Println(msg)
 This package is under the development. The unimplemented features that would be implemented are follwing:
 
 - Handling for [known types](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf) like `TimeStamp`
-- Randomize the number of elements in `List` and `Map` (Currently, it always set just one element)
+- Randomize the number of elements in `List` and `Map` (Currently, it always sets just one element)
 - Create another function that enables to specify the embedded values with the concreate fixed value or the custom rules like a length or format
 
 ## Contribution ✋
