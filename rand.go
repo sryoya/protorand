@@ -32,7 +32,7 @@ func (p *ProtoRand) Seed(seed int64) {
 	p.rand = rand.New(rand.NewSource(seed))
 }
 
-// EmbedValues embeds randoms value to fields in the provided proto message
+// EmbedValues embeds randoms value to fields in the provided proto message.
 func (p *ProtoRand) EmbedValues(msg proto.Message) error {
 	mds := msg.ProtoReflect().Descriptor()
 	dm, err := p.NewDynamicProtoRand(mds)
@@ -44,7 +44,7 @@ func (p *ProtoRand) EmbedValues(msg proto.Message) error {
 	return nil
 }
 
-// NewDynamicProtoRand created dynamicpb with assiging random value to proto
+// NewDynamicProtoRand creates dynamicpb with assiging random value to proto.
 func (p *ProtoRand) NewDynamicProtoRand(mds protoreflect.MessageDescriptor) (*dynamicpb.Message, error) {
 	getRandValue := func(fd protoreflect.FieldDescriptor) (protoreflect.Value, error) {
 		switch fd.Kind() {
