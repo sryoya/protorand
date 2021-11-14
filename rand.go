@@ -11,29 +11,31 @@ import (
 )
 
 var (
-	chars = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-
-	// These aim to enable to inject the random value to be fixed in testing
-	randomInt32      = genRandInt32
-	randomInt64      = genRandInt64
-	randomUint32     = genRandUint32
-	randomUint64     = genRandUint64
-	randomFloat32    = genRandFloat32
-	randomFloat64    = genRandFloat64
-	randomString     = genRandString
-	randomBool       = genRandBool
-	randIntForEnum   = rand.Intn
-	randIndexForEnum = rand.Intn
+	// Chars is the set of characters used to generate random strings.
+	Chars = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 )
 
-func init() {
-	rand.Seed(time.Now().UnixNano())
+// ProtoRand is a source of random values for protobuf fields.
+type ProtoRand struct {
+	rand *rand.Rand
+}
+
+// New creates a new ProtoRand.
+func New() *ProtoRand {
+	return &ProtoRand{
+		rand: rand.New(rand.NewSource(time.Now().UnixNano())),
+	}
+}
+
+// Seed sets the seed of the random generator.
+func (p *ProtoRand) Seed(seed int64) {
+	p.rand = rand.New(rand.NewSource(seed))
 }
 
 // EmbedValues embeds randoms value to fields in the provided proto message
-func EmbedValues(msg proto.Message) error {
+func (p *ProtoRand) EmbedValues(msg proto.Message) error {
 	mds := msg.ProtoReflect().Descriptor()
-	dm, err := NewDynamicProtoRand(mds)
+	dm, err := p.NewDynamicProtoRand(mds)
 	if err != nil {
 		return err
 	}
@@ -43,42 +45,44 @@ func EmbedValues(msg proto.Message) error {
 }
 
 // NewDynamicProtoRand created dynamicpb with assiging random value to proto
-func NewDynamicProtoRand(mds protoreflect.MessageDescriptor) (*dynamicpb.Message, error) {
+func (p *ProtoRand) NewDynamicProtoRand(mds protoreflect.MessageDescriptor) (*dynamicpb.Message, error) {
 	getRandValue := func(fd protoreflect.FieldDescriptor) (protoreflect.Value, error) {
 		switch fd.Kind() {
 		case protoreflect.Int32Kind:
-			return protoreflect.ValueOfInt32(randomInt32()), nil
+			return protoreflect.ValueOfInt32(p.randInt32()), nil
 		case protoreflect.Int64Kind:
-			return protoreflect.ValueOfInt64(randomInt64()), nil
+			return protoreflect.ValueOfInt64(p.randInt64()), nil
 		case protoreflect.Sint32Kind:
-			return protoreflect.ValueOfInt32(randomInt32()), nil
+			return protoreflect.ValueOfInt32(p.randInt32()), nil
 		case protoreflect.Sint64Kind:
-			return protoreflect.ValueOfInt64(randomInt64()), nil
+			return protoreflect.ValueOfInt64(p.randInt64()), nil
 		case protoreflect.Uint32Kind:
-			return protoreflect.ValueOfUint32(randomUint32()), nil
+			return protoreflect.ValueOfUint32(p.randUint32()), nil
 		case protoreflect.Uint64Kind:
-			return protoreflect.ValueOfUint64(randomUint64()), nil
+			return protoreflect.ValueOfUint64(p.randUint64()), nil
 		case protoreflect.Fixed32Kind:
-			return protoreflect.ValueOfUint32(randomUint32()), nil
+			return protoreflect.ValueOfUint32(p.randUint32()), nil
 		case protoreflect.Fixed64Kind:
-			return protoreflect.ValueOfUint64(randomUint64()), nil
+			return protoreflect.ValueOfUint64(p.randUint64()), nil
 		case protoreflect.Sfixed32Kind:
-			return protoreflect.ValueOfInt32(randomInt32()), nil
+			return protoreflect.ValueOfInt32(p.randInt32()), nil
 		case protoreflect.Sfixed64Kind:
-			return protoreflect.ValueOfInt64(randomInt64()), nil
+			return protoreflect.ValueOfInt64(p.randInt64()), nil
 		case protoreflect.FloatKind:
-			return protoreflect.ValueOfFloat32(randomFloat32()), nil
+			return protoreflect.ValueOfFloat32(p.randFloat32()), nil
 		case protoreflect.DoubleKind:
-			return protoreflect.ValueOfFloat64(randomFloat64()), nil
+			return protoreflect.ValueOfFloat64(p.randFloat64()), nil
 		case protoreflect.StringKind:
-			return protoreflect.ValueOfString(randomString(10)), nil
+			return protoreflect.ValueOfString(p.randString()), nil
 		case protoreflect.BoolKind:
-			return protoreflect.ValueOfBool(randomBool()), nil
+			return protoreflect.ValueOfBool(p.randBool()), nil
 		case protoreflect.EnumKind:
-			return protoreflect.ValueOfEnum(chooseEnumValueRandomly(fd.Enum().Values())), nil
+			return protoreflect.ValueOfEnum(p.chooseEnumValueRandomly(fd.Enum().Values())), nil
+		case protoreflect.BytesKind:
+			return protoreflect.ValueOfBytes(p.randBytes()), nil
 		case protoreflect.MessageKind:
 			// process recursively
-			rm, err := NewDynamicProtoRand(fd.Message())
+			rm, err := p.NewDynamicProtoRand(fd.Message())
 			if err != nil {
 				return protoreflect.Value{}, err
 			}
@@ -94,7 +98,7 @@ func NewDynamicProtoRand(mds protoreflect.MessageDescriptor) (*dynamicpb.Message
 	oneOfs := mds.Oneofs()
 	for i := 0; i < oneOfs.Len(); i++ {
 		oneOf := oneOfs.Get(i)
-		populatedOneOfField[oneOf.Name()] = chooseOneOfFieldRandomly(oneOf).Number()
+		populatedOneOfField[oneOf.Name()] = p.chooseOneOfFieldRandomly(oneOf).Number()
 	}
 
 	dm := dynamicpb.NewMessage(mds)
@@ -147,53 +151,57 @@ func NewDynamicProtoRand(mds protoreflect.MessageDescriptor) (*dynamicpb.Message
 	return dm, nil
 }
 
-func genRandInt32() int32 {
-	return rand.Int31()
+func (p *ProtoRand) randInt32() int32 {
+	return p.rand.Int31()
 }
 
-func genRandInt64() int64 {
-	return rand.Int63()
+func (p *ProtoRand) randInt64() int64 {
+	return p.rand.Int63()
 }
 
-func genRandUint32() uint32 {
-	return rand.Uint32()
+func (p *ProtoRand) randUint32() uint32 {
+	return p.rand.Uint32()
 }
 
-func genRandUint64() uint64 {
-	return rand.Uint64()
+func (p *ProtoRand) randUint64() uint64 {
+	return p.rand.Uint64()
 }
 
-func genRandFloat32() float32 {
-	return rand.Float32()
+func (p *ProtoRand) randFloat32() float32 {
+	return p.rand.Float32()
 }
 
-func genRandFloat64() float64 {
-	return rand.Float64()
+func (p *ProtoRand) randFloat64() float64 {
+	return p.rand.Float64()
 }
 
-func genRandString(n int) string {
-	b := make([]rune, n)
+func (p *ProtoRand) randBytes() []byte {
+	return []byte(p.randString())
+}
+
+func (p *ProtoRand) randString() string {
+	b := make([]rune, 10) // TODO: make the length randomly or use a predefined length?
 	for i := range b {
-		b[i] = chars[rand.Intn(len(chars))]
+		b[i] = Chars[p.rand.Intn(len(Chars))]
 	}
 	return string(b)
 }
 
-func genRandBool() bool {
-	return rand.Int31()%2 == 0
+func (p *ProtoRand) randBool() bool {
+	return p.rand.Int31()%2 == 0
 }
 
-func chooseEnumValueRandomly(values protoreflect.EnumValueDescriptors) protoreflect.EnumNumber {
+func (p *ProtoRand) chooseEnumValueRandomly(values protoreflect.EnumValueDescriptors) protoreflect.EnumNumber {
 	ln := values.Len()
 	if ln <= 1 {
 		return 0
 	}
 
-	value := values.Get(randIntForEnum(ln - 1))
+	value := values.Get(p.rand.Intn(ln - 1))
 	return value.Number()
 }
 
-func chooseOneOfFieldRandomly(oneOf protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
-	index := randIndexForEnum(oneOf.Fields().Len() - 1)
+func (p *ProtoRand) chooseOneOfFieldRandomly(oneOf protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+	index := p.rand.Intn(oneOf.Fields().Len() - 1)
 	return oneOf.Fields().Get(index)
 }

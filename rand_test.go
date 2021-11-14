@@ -3,69 +3,79 @@ package protorand
 import (
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
-	"google.golang.org/protobuf/testing/protocmp"
-
 	testpb "github.com/sryoya/protorand/testdata"
 )
 
-func init() {
-	// inject random generated values to be fixed
-	randomInt32 = func() int32 { return 10 }
-	randomUint32 = func() uint32 { return 11 }
-	randomFloat32 = func() float32 { return 10.1 }
-	randomInt64 = func() int64 { return 20 }
-	randomUint64 = func() uint64 { return 21 }
-	randomFloat64 = func() float64 { return 20.22 }
-	randomString = func(int) string { return "Gopher" }
-	randomBool = func() bool { return true }
-	randIntForEnum = func(n int) int { return n }
-	randIndexForEnum = func(n int) int { return n }
-}
-
 func TestEmbedValues(t *testing.T) {
+	p := New()
+	p.Seed(0)
+
 	target := &testpb.TestMessage{}
 
-	expected := &testpb.TestMessage{
-		SomeInt32:    10,
-		SomeSint32:   10,
-		SomeUint32:   11,
-		SomeFloat32:  10.1,
-		SomeFixed32:  11,
-		SomeSfixed32: 10,
-		SomeInt64:    20,
-		SomeSint64:   20,
-		SomeUint64:   21,
-		SomeFloat64:  10.1,
-		SomeFixed64:  21,
-		SomeSfixed64: 20,
-		SomeStr:      "Gopher",
-		SomeBool:     true,
-		SomeMsg: &testpb.ChildMessage{
-			SomeInt: 10,
-		},
-		SomeSlice: []string{"Gopher"},
-		SomeMsgs: []*testpb.ChildMessage{
-			{SomeInt: 10},
-		},
-		SomeMap: map[int32]*testpb.ChildMessage{
-			10: {
-				SomeInt: 10,
-			},
-		},
-		SomeEnum:  testpb.SomeEnum_SOME_ENUM_VALUE_2,
-		SomeEnum2: 0,
-		SomeOneOf: &testpb.TestMessage_OneOfStr{
-			OneOfStr: "Gopher",
-		},
-	}
-
-	err := EmbedValues(target)
+	err := p.EmbedValues(target)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
 
-	if diff := cmp.Diff(expected, target, protocmp.Transform()); diff != "" {
-		t.Errorf("response didn't match (-want / +got)\n%s", diff)
+	// assert all the fields got some value
+	if target.SomeInt32 == 0 {
+		t.Errorf("Field SomeInt32 is not set")
+	}
+	if target.SomeSint32 == 0 {
+		t.Errorf("Field SomeSint32 is not set")
+	}
+	if target.SomeUint32 == 0 {
+		t.Errorf("Field SomeUint32 is not set")
+	}
+	if target.SomeFloat32 == 0 {
+		t.Errorf("Field SomeFloat32 is not set")
+	}
+	if target.SomeFixed32 == 0 {
+		t.Errorf("Field SomeFixed32 is not set")
+	}
+	if target.SomeSfixed32 == 0 {
+		t.Errorf("Field SomeSfixed32 is not set")
+	}
+	if target.SomeInt64 == 0 {
+		t.Errorf("Field SomeInt64 is not set")
+	}
+	if target.SomeSint64 == 0 {
+		t.Errorf("Field SomeSint64 is not set")
+	}
+	if target.SomeUint64 == 0 {
+		t.Errorf("Field SomeUint64 is not set")
+	}
+	if target.SomeFloat64 == 0 {
+		t.Errorf("Field SomeFloat64 is not set")
+	}
+	if target.SomeFixed64 == 0 {
+		t.Errorf("Field SomeFixed64 is not set")
+	}
+	if target.SomeSfixed64 == 0 {
+		t.Errorf("Field SomeSfixed64 is not set")
+	}
+	if target.SomeStr == "" {
+		t.Errorf("Field SomeStr is not set")
+	}
+	if target.SomeMsg == nil {
+		t.Errorf("Field SomeMsg is not set")
+	}
+	if len(target.SomeSlice) == 0 {
+		t.Errorf("Field SomeSlice is not set")
+	}
+	if len(target.SomeMsgs) == 0 {
+		t.Errorf("Field SomeMsgs is not set")
+	}
+	if len(target.SomeMap) == 0 {
+		t.Errorf("Field SomeMap is not set")
+	}
+	if target.SomeEnum > 3 { // undeclared enum value
+		t.Errorf("Field SomeEnum is not set")
+	}
+	if target.SomeEnum2 > 1 { // undeclared enum value
+		t.Errorf("Field SomeEnum2 is not set")
+	}
+	if target.SomeOneOf == nil {
+		t.Errorf("Field SomeOneOf is not set")
 	}
 }
