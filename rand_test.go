@@ -3,6 +3,8 @@ package protorand
 import (
 	"testing"
 
+	"google.golang.org/protobuf/proto"
+
 	testpb "github.com/sryoya/protorand/testdata"
 )
 
@@ -10,72 +12,78 @@ func TestEmbedValues(t *testing.T) {
 	p := New()
 	p.Seed(0)
 
-	target := &testpb.TestMessage{}
-
-	err := p.EmbedValues(target)
+	input := &testpb.TestMessage{}
+	res, err := p.Gen(input)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
 
+	// check if the input is not mutated.
+	if !proto.Equal(input, &testpb.TestMessage{}) {
+		t.Errorf("The input was unexpectedly mutated.")
+	}
+
+	got := res.(*testpb.TestMessage)
+
 	// assert all the fields got some value
-	if target.SomeInt32 == 0 {
+	if got.SomeInt32 == 0 {
 		t.Errorf("Field SomeInt32 is not set")
 	}
-	if target.SomeSint32 == 0 {
+	if got.SomeSint32 == 0 {
 		t.Errorf("Field SomeSint32 is not set")
 	}
-	if target.SomeUint32 == 0 {
+	if got.SomeUint32 == 0 {
 		t.Errorf("Field SomeUint32 is not set")
 	}
-	if target.SomeFloat32 == 0 {
+	if got.SomeFloat32 == 0 {
 		t.Errorf("Field SomeFloat32 is not set")
 	}
-	if target.SomeFixed32 == 0 {
+	if got.SomeFixed32 == 0 {
 		t.Errorf("Field SomeFixed32 is not set")
 	}
-	if target.SomeSfixed32 == 0 {
+	if got.SomeSfixed32 == 0 {
 		t.Errorf("Field SomeSfixed32 is not set")
 	}
-	if target.SomeInt64 == 0 {
+	if got.SomeInt64 == 0 {
 		t.Errorf("Field SomeInt64 is not set")
 	}
-	if target.SomeSint64 == 0 {
+	if got.SomeSint64 == 0 {
 		t.Errorf("Field SomeSint64 is not set")
 	}
-	if target.SomeUint64 == 0 {
+	if got.SomeUint64 == 0 {
 		t.Errorf("Field SomeUint64 is not set")
 	}
-	if target.SomeFloat64 == 0 {
+	if got.SomeFloat64 == 0 {
 		t.Errorf("Field SomeFloat64 is not set")
 	}
-	if target.SomeFixed64 == 0 {
+	if got.SomeFixed64 == 0 {
 		t.Errorf("Field SomeFixed64 is not set")
 	}
-	if target.SomeSfixed64 == 0 {
+	if got.SomeSfixed64 == 0 {
 		t.Errorf("Field SomeSfixed64 is not set")
 	}
-	if target.SomeStr == "" {
+	if got.SomeStr == "" {
 		t.Errorf("Field SomeStr is not set")
 	}
-	if target.SomeMsg == nil {
+	if got.SomeMsg == nil {
 		t.Errorf("Field SomeMsg is not set")
 	}
-	if len(target.SomeSlice) == 0 {
+	if len(got.SomeSlice) == 0 {
 		t.Errorf("Field SomeSlice is not set")
 	}
-	if len(target.SomeMsgs) == 0 {
+	if len(got.SomeMsgs) == 0 {
 		t.Errorf("Field SomeMsgs is not set")
 	}
-	if len(target.SomeMap) == 0 {
+	if len(got.SomeMap) == 0 {
 		t.Errorf("Field SomeMap is not set")
 	}
-	if target.SomeEnum > 3 { // undeclared enum value
+	if got.SomeEnum > 3 { // undeclared enum value
 		t.Errorf("Field SomeEnum is not set")
 	}
-	if target.SomeEnum2 > 1 { // undeclared enum value
+	if got.SomeEnum2 > 1 { // undeclared enum value
 		t.Errorf("Field SomeEnum2 is not set")
 	}
-	if target.SomeOneOf == nil {
+	if got.SomeOneOf == nil {
 		t.Errorf("Field SomeOneOf is not set")
 	}
 }

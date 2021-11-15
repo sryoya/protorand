@@ -3,6 +3,7 @@ package protorand
 import (
 	"fmt"
 	"math/rand"
+	"reflect"
 	"time"
 
 	"google.golang.org/protobuf/proto"
@@ -32,16 +33,19 @@ func (p *ProtoRand) Seed(seed int64) {
 	p.rand = rand.New(rand.NewSource(seed))
 }
 
-// EmbedValues embeds randoms value to fields in the provided proto message.
-func (p *ProtoRand) EmbedValues(msg proto.Message) error {
-	mds := msg.ProtoReflect().Descriptor()
+// Gen generates a new proto.Message having randoms value in its fields.
+// The input is used to specify the type of the generated message.
+// The input itself is immutable.
+func (p *ProtoRand) Gen(in proto.Message) (proto.Message, error) {
+	mds := in.ProtoReflect().Descriptor()
 	dm, err := p.NewDynamicProtoRand(mds)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	proto.Merge(msg, dm)
-	return nil
+	out := reflect.New(reflect.ValueOf(in).Elem().Type()).Interface().(proto.Message)
+	proto.Merge(out, dm)
+	return out, nil
 }
 
 // NewDynamicProtoRand creates dynamicpb with assiging random value to proto.
