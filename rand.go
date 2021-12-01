@@ -91,7 +91,6 @@ func (p *ProtoRand) NewDynamicProtoRand(mds protoreflect.MessageDescriptor) (*dy
 				return protoreflect.Value{}, err
 			}
 			return protoreflect.ValueOfMessage(rm), nil
-		// TODO: Sint32Kind, Sfixed32Kind, Sint64Kind, Sfixed64Kind, BytesKind, GroupKind
 		default:
 			return protoreflect.Value{}, fmt.Errorf("unexpected type: %v", fd.Kind())
 		}
