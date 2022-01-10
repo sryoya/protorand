@@ -9,7 +9,7 @@ It also recursibely embeds values to struct fields in a struct and supports Map,
 You can generate proto messages filled with random values.
 You can use it for some testing purposes like random value test or performance test.
 
-## Install 🚀
+## Install
 
 ```
 $ go get -u github.com/sryoya/protorand
@@ -24,21 +24,28 @@ res, err := pr.Gen(pb)
 if err != nil {
     // some error handling
 }
-fmt.Println(res) // now it prints the protobuf message struct with random values
+fmt.Println(res)
+// now it prints the protobuf message struct with random values like this:
+// some_str:"EtNkGoBvGg"  some_int32:895194746  some_sint32:1378122731  some_uint32:2018831629  some_fixed32:3152315036  some_sfixed32:1347258978  some_int64:6534493099247216387  some_sint64:724134999722101364  some_uint64:9797562765629663753  some_fixed64:9494449334166659795  some_sfixed64:2365978907336111062  some_float32:0.31029108  some_float64:0.07361103  some_slice:"qgWT3LG6Nh"  some_msg:{some_int:1226009465}  some_msgs:{some_int:276429239}  some_map:{key:1431285010  value:{some_int:387368828}}  some_enum:SOME_ENUM_VALUE_1  one_of_int32:1768554790
 ```
 
-## To Be Developped 🏭
+## FAQ
 
-This package is under the development. The unimplemented features that would be implemented are follwing:
+Q. Does this package allow me to set fixed values or use specific rules for certain fields?
+A. No, at least now. We can operate proto message structs with the normal way like `msg.FieldA = "somevalue"` . When we have specific rules for some fields, we can just change the values of them on the values that `protorand` generates. `protorand` aims to provide an easy and common way to help generating the random proto message struct.
+
+## To Be Developped
+
+This package still has some points to update. The unimplemented features are follwing:
 
 - Handling for [known types](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf) like `TimeStamp`
 - Randomize the number of elements in `List` and `Map` (Currently, it always sets just one element)
 - `Optional` field
 
-## Contribution ✋
+## Contribution
 
 You are more than welcome to contribute to this project. Fork and make a Pull Request, or create an Issue if you see any problem.
 
-## Licence 🗃️
+## Licence
 
 [MIT License](./LICENSE)
