@@ -34,6 +34,7 @@ fmt.Println(res)
 ## FAQ
 
 Q. Does this package allow me to set fixed values or use specific rules for certain fields?
+
 A. No, at least now. We can operate proto message structs with the normal way like `msg.FieldA = "some value"` . When we have specific rules for some fields, we can just change the values in them, overwriting the values that `protorand` generates. `protorand` aims to provide an easy and common way to help generating the random protobuf message struct.
 
 ## To Be Developped
