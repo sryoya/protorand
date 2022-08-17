@@ -152,7 +152,7 @@ func (p *ProtoRand) newDynamicProtoRand(mds protoreflect.MessageDescriptor, allo
 			if err != nil {
 				return nil, err
 			}
-			mp.Set(protoreflect.MapKey(key), protoreflect.Value(value))
+			mp.Set(protoreflect.MapKey(key), value)
 			dm.Set(fd, protoreflect.ValueOfMap(mp))
 			continue
 		}
@@ -161,6 +161,7 @@ func (p *ProtoRand) newDynamicProtoRand(mds protoreflect.MessageDescriptor, allo
 		if err != nil {
 			return nil, err
 		}
+		fmt.Printf("assinging %+v (type %T) to field %v (kind %v)\n", value, value, fd.FullName(), fd.Kind())
 		dm.Set(fd, value)
 	}
 
