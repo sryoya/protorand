@@ -11,6 +11,12 @@ import (
 	"google.golang.org/protobuf/types/dynamicpb"
 )
 
+const (
+	// MaxDepth is the maximum stack depth for recursion, which prevents stack overflows if a message is (directly or
+	// transitively) self-referential.
+	MaxDepth = 16
+)
+
 var (
 	// Chars is the set of characters used to generate random strings.
 	Chars = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
@@ -48,10 +54,12 @@ func (p *ProtoRand) Gen(in proto.Message) (proto.Message, error) {
 	return out, nil
 }
 
-// NewDynamicProtoRand creates dynamicpb with assiging random value to proto.
+// NewDynamicProtoRand creates dynamicpb with assigning random values to a proto.
 func (p *ProtoRand) NewDynamicProtoRand(mds protoreflect.MessageDescriptor) (*dynamicpb.Message, error) {
-	fmt.Printf("NewDynamicProtoRand(%v)\n", mds.Name())
+	return p.newDynamicProtoRand(mds, MaxDepth)
+}
 
+func (p *ProtoRand) newDynamicProtoRand(mds protoreflect.MessageDescriptor, allowedDepth int) (*dynamicpb.Message, error) {
 	getRandValue := func(fd protoreflect.FieldDescriptor) (protoreflect.Value, error) {
 		switch fd.Kind() {
 		case protoreflect.Int32Kind:
@@ -87,12 +95,15 @@ func (p *ProtoRand) NewDynamicProtoRand(mds protoreflect.MessageDescriptor) (*dy
 		case protoreflect.BytesKind:
 			return protoreflect.ValueOfBytes(p.randBytes()), nil
 		case protoreflect.MessageKind:
-			// process recursively
-			rm, err := p.NewDynamicProtoRand(fd.Message())
-			if err != nil {
-				return protoreflect.Value{}, err
+			// process recursively (if we have more stacks to give...)
+			if allowedDepth > 0 {
+				rm, err := p.newDynamicProtoRand(fd.Message(), allowedDepth-1)
+				if err != nil {
+					return protoreflect.Value{}, err
+				}
+				return protoreflect.ValueOfMessage(rm), nil
 			}
-			return protoreflect.ValueOfMessage(rm), nil
+			return protoreflect.ValueOfMessage(dynamicpb.NewMessage(mds)), nil
 		default:
 			return protoreflect.Value{}, fmt.Errorf("unexpected type: %v", fd.Kind())
 		}
@@ -146,7 +157,6 @@ func (p *ProtoRand) NewDynamicProtoRand(mds protoreflect.MessageDescriptor) (*dy
 			continue
 		}
 
-		fmt.Printf("calling getRandValue on field %v\n", fd.Name())
 		value, err := getRandValue(fd)
 		if err != nil {
 			return nil, err

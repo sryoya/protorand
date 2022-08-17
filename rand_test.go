@@ -5,7 +5,7 @@ import (
 
 	"google.golang.org/protobuf/proto"
 
-	testpb "github.com/sryoya/protorand/testdata"
+	testpb "github.com/wattch/protorand/testdata"
 )
 
 func TestEmbedValues(t *testing.T) {

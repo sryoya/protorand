@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/sryoya/protorand"
-	testpb "github.com/sryoya/protorand/testdata"
+	"github.com/wattch/protorand"
+	testpb "github.com/wattch/protorand/testdata"
 )
 
 func main() {

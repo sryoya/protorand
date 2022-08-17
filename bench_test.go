@@ -3,7 +3,7 @@ package protorand
 import (
 	"testing"
 
-	testpb "github.com/sryoya/protorand/testdata"
+	testpb "github.com/wattch/protorand/testdata"
 )
 
 func BenchmarkGen(b *testing.B) {

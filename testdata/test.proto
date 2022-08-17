@@ -1,6 +1,6 @@
 syntax = "proto3";
 package testproto;
-option go_package = "github.com/sryoya/protorand/testproto";
+option go_package = "github.com/wattch/protorand/testproto";
 
 message TestMessage {
   string some_str = 1;
@@ -31,6 +31,7 @@ message TestMessage {
 
 message ChildMessage{
   int32 some_int = 1;
+  optional ChildMessage sub_child = 2;
 }
 
 enum SomeEnum {
