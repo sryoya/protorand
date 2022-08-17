@@ -1,4 +1,4 @@
-module github.com/sryoya/protorand
+module github.com/wattch/protorand
 
 go 1.17
 
