@@ -50,6 +50,8 @@ func (p *ProtoRand) Gen(in proto.Message) (proto.Message, error) {
 
 // NewDynamicProtoRand creates dynamicpb with assiging random value to proto.
 func (p *ProtoRand) NewDynamicProtoRand(mds protoreflect.MessageDescriptor) (*dynamicpb.Message, error) {
+	fmt.Printf("NewDynamicProtoRand(%v)\n", mds.Name())
+
 	getRandValue := func(fd protoreflect.FieldDescriptor) (protoreflect.Value, error) {
 		switch fd.Kind() {
 		case protoreflect.Int32Kind:
@@ -144,6 +146,7 @@ func (p *ProtoRand) NewDynamicProtoRand(mds protoreflect.MessageDescriptor) (*dy
 			continue
 		}
 
+		fmt.Printf("calling getRandValue on field %v\n", fd.Name())
 		value, err := getRandValue(fd)
 		if err != nil {
 			return nil, err
