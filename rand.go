@@ -103,7 +103,7 @@ func (p *ProtoRand) newDynamicProtoRand(mds protoreflect.MessageDescriptor, allo
 				}
 				return protoreflect.ValueOfMessage(rm), nil
 			}
-			fmt.Printf("out of stacks, you get empty message\n")
+			// recursed too deep; just return an empty protobuf message
 			return protoreflect.ValueOfMessage(dynamicpb.NewMessage(fd.Message())), nil
 		default:
 			return protoreflect.Value{}, fmt.Errorf("unexpected type: %v", fd.Kind())
@@ -162,7 +162,6 @@ func (p *ProtoRand) newDynamicProtoRand(mds protoreflect.MessageDescriptor, allo
 		if err != nil {
 			return nil, err
 		}
-		fmt.Printf("assinging %+v to field %v (kind %v)\n", value, fd.FullName(), fd.Kind())
 		dm.Set(fd, value)
 	}
 
