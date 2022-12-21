@@ -1,5 +1,7 @@
 package protorand
 
+//go:generate go run github.com/bufbuild/buf/cmd/buf@v1.11.0 generate
+
 import (
 	"testing"
 
