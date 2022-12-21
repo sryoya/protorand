@@ -9,6 +9,8 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/dynamicpb"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var (
@@ -51,6 +53,35 @@ func (p *ProtoRand) Gen(in proto.Message) (proto.Message, error) {
 // NewDynamicProtoRand creates dynamicpb with assiging random value to proto.
 func (p *ProtoRand) NewDynamicProtoRand(mds protoreflect.MessageDescriptor) (*dynamicpb.Message, error) {
 	getRandValue := func(fd protoreflect.FieldDescriptor) (protoreflect.Value, error) {
+		switch fd.FullName() {
+		case "google.protobuf.Timestamp":
+			const minTimestamp = -62135596800  // Seconds between 1970-01-01T00:00:00Z and 0001-01-01T00:00:00Z, inclusive
+			const maxTimestamp = +253402300799 // Seconds between 1970-01-01T00:00:00Z and 9999-12-31T23:59:59Z, inclusive
+			const maxNanos = 1e9               // exclusive
+			t := &timestamppb.Timestamp{
+				Seconds: p.rand.Int63n(maxTimestamp-minTimestamp+1) + minTimestamp,
+				Nanos:   p.rand.Int31n(maxNanos),
+			}
+			return protoreflect.ValueOf(t), nil
+		case "google.protobuf.Duration":
+			const absDuration = 315576000000 // 10000yr * 365.25day/yr * 24hr/day * 60min/hr * 60sec/min
+			const maxNanos = 1e9             // exclusive
+			s := p.rand.Int63n(2*absDuration+1) - absDuration
+			n := int32(0)
+			switch {
+			case s == 0:
+				n = p.rand.Int31n(2*maxNanos+1) - maxNanos
+			case s > 0:
+				n = p.rand.Int31n(maxNanos + 1)
+			case s < 0:
+				n = p.rand.Int31n(maxNanos+1) - maxNanos
+			}
+			d := &durationpb.Duration{
+				Seconds: s,
+				Nanos:   n,
+			}
+			return protoreflect.ValueOf(d), nil
+		}
 		switch fd.Kind() {
 		case protoreflect.Int32Kind:
 			return protoreflect.ValueOfInt32(p.randInt32()), nil
@@ -85,8 +116,38 @@ func (p *ProtoRand) NewDynamicProtoRand(mds protoreflect.MessageDescriptor) (*dy
 		case protoreflect.BytesKind:
 			return protoreflect.ValueOfBytes(p.randBytes()), nil
 		case protoreflect.MessageKind:
+			msg := fd.Message()
+			switch msg.FullName() {
+			case "google.protobuf.Timestamp":
+				const minTimestamp = -62135596800  // Seconds between 1970-01-01T00:00:00Z and 0001-01-01T00:00:00Z, inclusive
+				const maxTimestamp = +253402300799 // Seconds between 1970-01-01T00:00:00Z and 9999-12-31T23:59:59Z, inclusive
+				const maxNanos = 1e9               // exclusive
+				t := &timestamppb.Timestamp{
+					Seconds: p.rand.Int63n(maxTimestamp-minTimestamp+1) + minTimestamp,
+					Nanos:   p.rand.Int31n(maxNanos),
+				}
+				return protoreflect.ValueOf(t.ProtoReflect()), nil
+			case "google.protobuf.Duration":
+				const absDuration = 315576000000 // 10000yr * 365.25day/yr * 24hr/day * 60min/hr * 60sec/min
+				const maxNanos = 1e9             // exclusive
+				s := p.rand.Int63n(2*absDuration+1) - absDuration
+				n := int32(0)
+				switch {
+				case s == 0:
+					n = p.rand.Int31n(2*maxNanos+1) - maxNanos
+				case s > 0:
+					n = p.rand.Int31n(maxNanos + 1)
+				case s < 0:
+					n = p.rand.Int31n(maxNanos+1) - maxNanos
+				}
+				d := &durationpb.Duration{
+					Seconds: s,
+					Nanos:   n,
+				}
+				return protoreflect.ValueOf(d.ProtoReflect()), nil
+			}
 			// process recursively
-			rm, err := p.NewDynamicProtoRand(fd.Message())
+			rm, err := p.NewDynamicProtoRand(msg)
 			if err != nil {
 				return protoreflect.Value{}, err
 			}
