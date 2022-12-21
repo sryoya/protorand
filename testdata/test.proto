@@ -1,5 +1,7 @@
 syntax = "proto3";
+
 package testproto;
+
 option go_package = "github.com/sryoya/protorand/testproto";
 
 message TestMessage {
@@ -29,7 +31,7 @@ message TestMessage {
   }
 }
 
-message ChildMessage{
+message ChildMessage {
   int32 some_int = 1;
 }
 
