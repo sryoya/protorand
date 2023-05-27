@@ -20,13 +20,15 @@ var (
 
 // ProtoRand is a source of random values for protobuf fields.
 type ProtoRand struct {
-	rand *rand.Rand
+	rand                  *rand.Rand
+	MaxCollectionElements int
 }
 
 // New creates a new ProtoRand.
 func New() *ProtoRand {
 	return &ProtoRand{
-		rand: rand.New(rand.NewSource(time.Now().UnixNano())),
+		rand:                  rand.New(rand.NewSource(time.Now().UnixNano())),
+		MaxCollectionElements: 10,
 	}
 }
 
@@ -180,27 +182,31 @@ func (p *ProtoRand) NewDynamicProtoRand(mds protoreflect.MessageDescriptor) (*dy
 
 		if fd.IsList() {
 			list := dm.Mutable(fd).List()
-			// TODO: decide the number of elements randomly
-			value, err := getRandValue(fd)
-			if err != nil {
-				return nil, err
+			n := p.rand.Intn(p.MaxCollectionElements) + 1
+			for i := 0; i < n; i++ {
+				value, err := getRandValue(fd)
+				if err != nil {
+					return nil, err
+				}
+				list.Append(value)
 			}
-			list.Append(value)
 			dm.Set(fd, protoreflect.ValueOfList(list))
 			continue
 		}
 		if fd.IsMap() {
 			mp := dm.Mutable(fd).Map()
-			// TODO: make the number of elements randomly
-			key, err := getRandValue(fd.MapKey())
-			if err != nil {
-				return nil, err
+			n := p.rand.Intn(p.MaxCollectionElements) + 1
+			for i := 0; i < n; i++ {
+				key, err := getRandValue(fd.MapKey())
+				if err != nil {
+					return nil, err
+				}
+				value, err := getRandValue(fd.MapValue())
+				if err != nil {
+					return nil, err
+				}
+				mp.Set(protoreflect.MapKey(key), protoreflect.Value(value))
 			}
-			value, err := getRandValue(fd.MapValue())
-			if err != nil {
-				return nil, err
-			}
-			mp.Set(protoreflect.MapKey(key), protoreflect.Value(value))
 			dm.Set(fd, protoreflect.ValueOfMap(mp))
 			continue
 		}
