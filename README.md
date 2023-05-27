@@ -41,7 +41,6 @@ A. No, at least now. We can operate proto message structs with the normal way li
 
 This package still has some points to update. The unimplemented features are follwing:
 
-- Handling for [known types](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf) like `TimeStamp`
 - Randomize the number of elements in `List` and `Map` (Currently, it always sets just one element)
 - `Optional` field
 

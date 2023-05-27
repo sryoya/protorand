@@ -2,6 +2,9 @@ syntax = "proto3";
 
 package testproto;
 
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
 option go_package = "github.com/sryoya/protorand/testproto";
 
 message TestMessage {
@@ -29,6 +32,8 @@ message TestMessage {
     int32 one_of_int32 = 21;
     string one_of_str = 22;
   }
+  google.protobuf.Timestamp timestamp = 23;
+  google.protobuf.Duration duration = 24;
 }
 
 message ChildMessage {

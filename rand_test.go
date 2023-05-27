@@ -88,4 +88,10 @@ func TestEmbedValues(t *testing.T) {
 	if got.SomeOneOf == nil {
 		t.Errorf("Field SomeOneOf is not set")
 	}
+	if got.Timestamp == nil {
+		t.Errorf("Field Timestamp is not set")
+	}
+	if got.Duration == nil {
+		t.Errorf("Field Duration is not set")
+	}
 }
