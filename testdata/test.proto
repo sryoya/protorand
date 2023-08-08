@@ -32,8 +32,11 @@ message TestMessage {
     int32 one_of_int32 = 21;
     string one_of_str = 22;
   }
-  google.protobuf.Timestamp timestamp = 23;
-  google.protobuf.Duration duration = 24;
+  oneof one_of_with_single_field {
+    int32 one_of_single_field = 23;
+  }
+  google.protobuf.Timestamp timestamp = 24;
+  google.protobuf.Duration duration = 25;
 }
 
 message ChildMessage {
