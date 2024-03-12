@@ -70,6 +70,15 @@ func TestEmbedValues(t *testing.T) {
 	if got.SomeMsg == nil {
 		t.Errorf("Field SomeMsg is not set")
 	}
+	if got.SomeMsg.SomeInt == 0 {
+		t.Errorf("Field SomeMsg.SomeInt is not set")
+	}
+	if got.SomeMsg.SubChild == nil {
+		t.Errorf("Field SomeMsg.SubChild is not set")
+	}
+	if got.SomeMsg.SubChild.SomeInt == 0 {
+		t.Errorf("Field SomeMsg.SubChild.SomeInt is not set")
+	}
 	if len(got.SomeSlice) == 0 {
 		t.Errorf("Field SomeSlice is not set")
 	}

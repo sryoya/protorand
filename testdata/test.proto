@@ -41,6 +41,7 @@ message TestMessage {
 
 message ChildMessage {
   int32 some_int = 1;
+  optional ChildMessage sub_child = 2;
 }
 
 enum SomeEnum {
